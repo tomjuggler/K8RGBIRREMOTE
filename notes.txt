@@ -1,0 +1,10 @@
+I am porting the BluetoothK8IRRGBremote Arduino sketch over to PlatformIO. 
+Currently it is written to use an external Bluetooth Module (accessed via serial)
+It currently works best on Arduino Nano 
+
+New version: ESP32 C3 with built-in bluetooth. This also has a built-in RGB LED on GPIO pin 8. 
+We will be using ESP32 Bluetooth, but the same serial over bluetooth commands (coming from an app)
+We need to include the bluetooth connection software for ESP32 C3
+We can use FastLED Library for the WS2812 LED. 
+We will be using PlatformIO best practises. Setting up from scratch. 
+
