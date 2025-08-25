@@ -134,7 +134,7 @@ void setup() {
     Clear();
 
     // Setup IR Sender
-    irsend.begin(IR_TX_PIN);
+    irsend.begin(IR_TX_PIN, false);
 
     // Setup WiFi AP
     WiFi.softAP("K8_RGB_IR_REMOTE");
