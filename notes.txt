@@ -8,3 +8,5 @@ We need to include the bluetooth connection software for ESP32 C3
 We can use FastLED Library for the WS2812 LED. 
 We will be using PlatformIO best practises. Setting up from scratch. 
 
+- Note: Bluetooth Classic was not available so switched to WiFi
+- Note for simplicity using RGB Common Cathode LED with digitalWrite
