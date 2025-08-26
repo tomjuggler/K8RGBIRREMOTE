@@ -6,7 +6,7 @@
 #include <IRremote.hpp>
 
 // --- Pin Definitions ---
-const uint16_t kLedPin = 10;
+const uint16_t kLedPin = 8;
 const uint16_t kIrLedPin = 4;
 
 // --- Objects ---
@@ -161,8 +161,8 @@ void loop() {
 // --- Color and Command Functions ---
 void Clear() { 
     Serial.println("Clear called");
-    leds[0] = CRGB::Black; 
-    FastLED.show(); 
+    // leds[0] = CRGB::Black; 
+    // FastLED.show(); 
 }
 void Red() { 
     Serial.println("Red called");
