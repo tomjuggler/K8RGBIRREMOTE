@@ -3,7 +3,7 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <FastLED.h>
-#include <IRremote.h>
+#include <IRremoteESP8266.h>
 
 // --- Pin Definitions ---
 const uint16_t kLedPin = 8;
