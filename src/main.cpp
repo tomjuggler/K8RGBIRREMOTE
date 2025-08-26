@@ -6,7 +6,7 @@
 #include <IRremote.hpp>
 
 // --- Pin Definitions ---
-const uint16_t kLedPin = 8;
+const uint16_t kLedPin = 10;
 const uint16_t kIrLedPin = 4;
 
 // --- Objects ---
@@ -130,6 +130,7 @@ void setup() {
 
     // Setup FastLED
     FastLED.addLeds<NEOPIXEL, kLedPin>(leds, 1);
+    FastLED.setBrightness(255);
     Clear();
 
     // Setup IR Sender
