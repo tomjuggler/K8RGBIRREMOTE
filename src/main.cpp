@@ -2,17 +2,17 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <DNSServer.h>
-#include <FastLED.h>
 #include <IRremote.hpp>
 
 // --- Pin Definitions ---
-const uint16_t kLedPin = 8;
 const uint16_t kIrLedPin = 4;
+const uint16_t rPin = 0;
+const uint16_t gPin = 1;
+const uint16_t bPin = 2;
 
 // --- Objects ---
 DNSServer dnsServer;
 WebServer server(80);
-CRGB leds[1];
 
 // --- Web Page ---
 const char INDEX_HTML[] = R"rawliteral(
