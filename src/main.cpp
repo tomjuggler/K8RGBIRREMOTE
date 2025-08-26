@@ -168,91 +168,91 @@ void Red() {
     Clear(); 
     leds[0] = CRGB::Red; 
     FastLED.show(); 
-    IrSender.sendNEC(0xFF10EF);
+    IrSender.sendNECMSB(0xFF10EF);
 }
 void Green() { 
     Serial.println("Green called");
     Clear(); 
     leds[0] = CRGB::Green; 
     FastLED.show(); 
-    IrSender.sendNEC(0xFF906F);
+    IrSender.sendNECMSB(0xFF906F);
 }
 void Blue() { 
     Serial.println("Blue called");
     Clear(); 
     leds[0] = CRGB::Blue; 
     FastLED.show(); 
-    IrSender.sendNEC(0xFF50AF);
+    IrSender.sendNECMSB(0xFF50AF);
 }
 void Yellow() { 
     Serial.println("Yellow called");
     Clear(); 
     leds[0].setRGB(150, 150, 0); 
     FastLED.show(); 
-    IrSender.sendNEC(0xFFD02F);
+    IrSender.sendNECMSB(0xFFD02F);
 }
 void Cyan() { 
     Serial.println("Cyan called");
     Clear(); 
     leds[0].setRGB(0, 150, 150); 
     FastLED.show(); 
-    IrSender.sendNEC(0xFFB04F);
+    IrSender.sendNECMSB(0xFFB04F);
 }
 void Magenta() { 
     Serial.println("Magenta called");
     Clear(); 
     leds[0].setRGB(200, 0, 140); 
     FastLED.show(); 
-    IrSender.sendNEC(0xFF30CF);
+    IrSender.sendNECMSB(0xFF30CF);
 }
 void White() { 
     Serial.println("White called");
     leds[0].setRGB(140, 140, 140); 
     FastLED.show(); 
-    IrSender.sendNEC(0xFF708F);
+    IrSender.sendNECMSB(0xFF708F);
 }
 void Off() { 
     Serial.println("Off called");
     Clear(); 
-    IrSender.sendNEC(0xFFE01F);
+    IrSender.sendNECMSB(0xFFE01F);
 }
 void Fade() { 
     Serial.println("Fade called");
-    IrSender.sendNEC(0xFFF00F);
+    IrSender.sendNECMSB(0xFFF00F);
 }
 void Strobeplus() { 
     Serial.println("Strobeplus called");
-    IrSender.sendNEC(0xFFA857);
+    IrSender.sendNECMSB(0xFFA857);
 }
 void RGBStrobe() { 
     Serial.println("RGBStrobe called");
-    IrSender.sendNEC(0xFF28D7);
+    IrSender.sendNECMSB(0xFF28D7);
 }
 void Rainbow() { 
     Serial.println("Rainbow called");
-    IrSender.sendNEC(0xFF6897);
+    IrSender.sendNECMSB(0xFF6897);
 }
 void Halfstrobe() { 
     Serial.println("Halfstrobe called");
-    IrSender.sendNEC(0xFFE817);
+    IrSender.sendNECMSB(0xFFE817);
 }
 void BGStrobe() { 
     Serial.println("BGStrobe called");
-    IrSender.sendNEC(0xFF9867);
+    IrSender.sendNECMSB(0xFF9867);
 }
 void GRStrobe() { 
     Serial.println("GRStrobe called");
-    IrSender.sendNEC(0xFF18E7);
+    IrSender.sendNECMSB(0xFF18E7);
 }
 void Next() { 
     Serial.println("Next called");
-    IrSender.sendNEC(0xFF20DF);
+    IrSender.sendNECMSB(0xFF20DF);
 }
 void Demo() { 
     Serial.println("Demo called");
-    IrSender.sendNEC(0xFF58A7);
+    IrSender.sendNECMSB(0xFF58A7);
 }
 void Previous() { 
     Serial.println("Previous called");
-    IrSender.sendNEC(0xFFA05F);
+    IrSender.sendNECMSB(0xFFA05F);
 }
