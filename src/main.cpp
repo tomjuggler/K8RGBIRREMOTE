@@ -3,7 +3,6 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <IRremote.hpp>
-#include "esp32-hal-ledc.h"
 
 // --- Pin Definitions ---
 const uint16_t kIrLedPin = 4;
@@ -129,13 +128,10 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Starting...");
 
-    // Setup PWM for RGB LED
-    ledcSetup(0, 5000, 8); // channel 0 for red, 5 kHz, 8-bit resolution
-    ledcAttach(rPin, 0);
-    ledcSetup(1, 5000, 8); // channel 1 for green
-    ledcAttach(gPin, 1);
-    ledcSetup(2, 5000, 8); // channel 2 for blue
-    ledcAttach(bPin, 2);
+    // Setup digital pins for RGB LED
+    pinMode(rPin, OUTPUT);
+    pinMode(gPin, OUTPUT);
+    pinMode(bPin, OUTPUT);
     Clear();
 
     // Setup IR Sender
@@ -166,63 +162,54 @@ void loop() {
 // --- Color and Command Functions ---
 void Clear() { 
     Serial.println("Clear called");
-    ledcWrite(0, 0);
-    ledcWrite(1, 0);
-    ledcWrite(2, 0);
+    digitalWrite(rPin, LOW);
+    digitalWrite(gPin, LOW);
+    digitalWrite(bPin, LOW);
 }
 void Red() { 
     Serial.println("Red called");
     Clear(); 
-    ledcWrite(0, 255);
-    ledcWrite(1, 0);
-    ledcWrite(2, 0);
+    digitalWrite(rPin, HIGH);
     IrSender.sendNECMSB(0xFF10EF, 32, false);
 }
 void Green() { 
     Serial.println("Green called");
     Clear(); 
-    ledcWrite(0, 0);
-    ledcWrite(1, 255);
-    ledcWrite(2, 0);
+    digitalWrite(gPin, HIGH);
     IrSender.sendNECMSB(0xFF906F, 32, false);
 }
 void Blue() { 
     Serial.println("Blue called");
     Clear(); 
-    ledcWrite(0, 0);
-    ledcWrite(1, 0);
-    ledcWrite(2, 255);
+    digitalWrite(bPin, HIGH);
     IrSender.sendNECMSB(0xFF50AF, 32, false);
 }
 void Yellow() { 
     Serial.println("Yellow called");
     Clear(); 
-    ledcWrite(0, 150);
-    ledcWrite(1, 150);
-    ledcWrite(2, 0);
+    digitalWrite(rPin, HIGH);
+    digitalWrite(gPin, HIGH);
     IrSender.sendNECMSB(0xFFD02F, 32, false);
 }
 void Cyan() { 
     Serial.println("Cyan called");
     Clear(); 
-    ledcWrite(0, 0);
-    ledcWrite(1, 150);
-    ledcWrite(2, 150);
+    digitalWrite(gPin, HIGH);
+    digitalWrite(bPin, HIGH);
     IrSender.sendNECMSB(0xFFB04F, 32, false);
 }
 void Magenta() { 
     Serial.println("Magenta called");
     Clear(); 
-    ledcWrite(0, 200);
-    ledcWrite(1, 0);
-    ledcWrite(2, 140);
+    digitalWrite(rPin, HIGH);
+    digitalWrite(bPin, HIGH);
     IrSender.sendNECMSB(0xFF30CF, 32, false);
 }
 void White() { 
     Serial.println("White called");
-    ledcWrite(0, 140);
-    ledcWrite(1, 140);
-    ledcWrite(2, 140);
+    digitalWrite(rPin, HIGH);
+    digitalWrite(gPin, HIGH);
+    digitalWrite(bPin, HIGH);
     IrSender.sendNECMSB(0xFF708F, 32, false);
 }
 void Off() { 
