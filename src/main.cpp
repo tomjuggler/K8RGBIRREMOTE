@@ -3,7 +3,7 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <FastLED.h>
-#include <ESP32_RMT_IRLib/IRsender.h>
+#include <IRremote.h>
 
 // --- Pin Definitions ---
 const uint16_t kLedPin = 8;
@@ -12,7 +12,6 @@ const uint16_t kIrLedPin = 4;
 // --- Objects ---
 DNSServer dnsServer;
 WebServer server(80);
-IRsender irsend(kIrLedPin);  // Create IRsend object on the correct pin
 CRGB leds[1];
 
 // --- Web Page ---
@@ -134,7 +133,7 @@ void setup() {
     Clear();
 
     // Setup IR Sender
-    irsend.begin();
+    IrSender.begin(kIrLedPin);
 
     // Setup WiFi AP
     WiFi.softAP("K8_RGB_IR_REMOTE");
@@ -169,91 +168,91 @@ void Red() {
     Clear(); 
     leds[0] = CRGB::Red; 
     FastLED.show(); 
-    irsend.sendNEC(0xFF10EF, 32); 
+    IrSender.sendNEC(0xFF10EF, 32, 0); 
 }
 void Green() { 
     Serial.println("Green called");
     Clear(); 
     leds[0] = CRGB::Green; 
     FastLED.show(); 
-    irsend.sendNEC(0xFF906F, 32); 
+    IrSender.sendNEC(0xFF906F, 32, 0); 
 }
 void Blue() { 
     Serial.println("Blue called");
     Clear(); 
     leds[0] = CRGB::Blue; 
     FastLED.show(); 
-    irsend.sendNEC(0xFF50AF, 32); 
+    IrSender.sendNEC(0xFF50AF, 32, 0); 
 }
 void Yellow() { 
     Serial.println("Yellow called");
     Clear(); 
     leds[0].setRGB(150, 150, 0); 
     FastLED.show(); 
-    irsend.sendNEC(0xFFD02F, 32); 
+    IrSender.sendNEC(0xFFD02F, 32, 0); 
 }
 void Cyan() { 
     Serial.println("Cyan called");
     Clear(); 
     leds[0].setRGB(0, 150, 150); 
     FastLED.show(); 
-    irsend.sendNEC(0xFFB04F, 32); 
+    IrSender.sendNEC(0xFFB04F, 32, 0); 
 }
 void Magenta() { 
     Serial.println("Magenta called");
     Clear(); 
     leds[0].setRGB(200, 0, 140); 
     FastLED.show(); 
-    irsend.sendNEC(0xFF30CF, 32); 
+    IrSender.sendNEC(0xFF30CF, 32, 0); 
 }
 void White() { 
     Serial.println("White called");
     leds[0].setRGB(140, 140, 140); 
     FastLED.show(); 
-    irsend.sendNEC(0xFF708F, 32); 
+    IrSender.sendNEC(0xFF708F, 32, 0); 
 }
 void Off() { 
     Serial.println("Off called");
     Clear(); 
-    irsend.sendNEC(0xFFE01F, 32); 
+    IrSender.sendNEC(0xFFE01F, 32, 0); 
 }
 void Fade() { 
     Serial.println("Fade called");
-    irsend.sendNEC(0xFFF00F, 32); 
+    IrSender.sendNEC(0xFFF00F, 32, 0); 
 }
 void Strobeplus() { 
     Serial.println("Strobeplus called");
-    irsend.sendNEC(0xFFA857, 32); 
+    IrSender.sendNEC(0xFFA857, 32, 0); 
 }
 void RGBStrobe() { 
     Serial.println("RGBStrobe called");
-    irsend.sendNEC(0xFF28D7, 32); 
+    IrSender.sendNEC(0xFF28D7, 32, 0); 
 }
 void Rainbow() { 
     Serial.println("Rainbow called");
-    irsend.sendNEC(0xFF6897, 32); 
+    IrSender.sendNEC(0xFF6897, 32, 0); 
 }
 void Halfstrobe() { 
     Serial.println("Halfstrobe called");
-    irsend.sendNEC(0xFFE817, 32); 
+    IrSender.sendNEC(0xFFE817, 32, 0); 
 }
 void BGStrobe() { 
     Serial.println("BGStrobe called");
-    irsend.sendNEC(0xFF9867, 32); 
+    IrSender.sendNEC(0xFF9867, 32, 0); 
 }
 void GRStrobe() { 
     Serial.println("GRStrobe called");
-    irsend.sendNEC(0xFF18E7, 32); 
+    IrSender.sendNEC(0xFF18E7, 32, 0); 
 }
 void Next() { 
     Serial.println("Next called");
-    irsend.sendNEC(0xFF20DF, 32); 
+    IrSender.sendNEC(0xFF20DF, 32, 0); 
 }
 void Demo() { 
     Serial.println("Demo called");
-    irsend.sendNEC(0xFF58A7, 32); 
+    IrSender.sendNEC(0xFF58A7, 32, 0); 
 }
 void Previous() { 
     Serial.println("Previous called");
-    irsend.sendNEC(0xFFA05F, 32); 
+    IrSender.sendNEC(0xFFA05F, 32, 0); 
 }
