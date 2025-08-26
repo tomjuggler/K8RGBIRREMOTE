@@ -3,6 +3,7 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <IRremote.hpp>
+#include "esp32-hal-ledc.h"
 
 // --- Pin Definitions ---
 const uint16_t kIrLedPin = 4;
@@ -130,11 +131,11 @@ void setup() {
 
     // Setup PWM for RGB LED
     ledcSetup(0, 5000, 8); // channel 0 for red, 5 kHz, 8-bit resolution
-    ledcAttachPin(rPin, 0);
+    ledcAttach(rPin, 0);
     ledcSetup(1, 5000, 8); // channel 1 for green
-    ledcAttachPin(gPin, 1);
+    ledcAttach(gPin, 1);
     ledcSetup(2, 5000, 8); // channel 2 for blue
-    ledcAttachPin(bPin, 2);
+    ledcAttach(bPin, 2);
     Clear();
 
     // Setup IR Sender
