@@ -15,7 +15,7 @@ WebServer server(80);
 CRGB leds[1];
 
 // --- Web Page ---
-const char INDEX_HTML[] PROGMEM = R"rawliteral(
+const char INDEX_HTML[] = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
 <head>
