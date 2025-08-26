@@ -128,9 +128,13 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Starting...");
 
-    // Setup FastLED
-    FastLED.addLeds<NEOPIXEL, kLedPin>(leds, 1);
-    FastLED.setBrightness(255);
+    // Setup PWM for RGB LED
+    ledcSetup(0, 5000, 8); // channel 0 for red, 5 kHz, 8-bit resolution
+    ledcAttachPin(rPin, 0);
+    ledcSetup(1, 5000, 8); // channel 1 for green
+    ledcAttachPin(gPin, 1);
+    ledcSetup(2, 5000, 8); // channel 2 for blue
+    ledcAttachPin(bPin, 2);
     Clear();
 
     // Setup IR Sender
@@ -161,55 +165,63 @@ void loop() {
 // --- Color and Command Functions ---
 void Clear() { 
     Serial.println("Clear called");
-    // leds[0] = CRGB::Black; 
-    // FastLED.show(); 
+    ledcWrite(0, 0);
+    ledcWrite(1, 0);
+    ledcWrite(2, 0);
 }
 void Red() { 
     Serial.println("Red called");
     Clear(); 
-    leds[0] = CRGB::Red; 
-    FastLED.show(); 
+    ledcWrite(0, 255);
+    ledcWrite(1, 0);
+    ledcWrite(2, 0);
     IrSender.sendNECMSB(0xFF10EF, 32, false);
 }
 void Green() { 
     Serial.println("Green called");
     Clear(); 
-    leds[0] = CRGB::Green; 
-    FastLED.show(); 
+    ledcWrite(0, 0);
+    ledcWrite(1, 255);
+    ledcWrite(2, 0);
     IrSender.sendNECMSB(0xFF906F, 32, false);
 }
 void Blue() { 
     Serial.println("Blue called");
     Clear(); 
-    leds[0] = CRGB::Blue; 
-    FastLED.show(); 
+    ledcWrite(0, 0);
+    ledcWrite(1, 0);
+    ledcWrite(2, 255);
     IrSender.sendNECMSB(0xFF50AF, 32, false);
 }
 void Yellow() { 
     Serial.println("Yellow called");
     Clear(); 
-    leds[0].setRGB(150, 150, 0); 
-    FastLED.show(); 
+    ledcWrite(0, 150);
+    ledcWrite(1, 150);
+    ledcWrite(2, 0);
     IrSender.sendNECMSB(0xFFD02F, 32, false);
 }
 void Cyan() { 
     Serial.println("Cyan called");
     Clear(); 
-    leds[0].setRGB(0, 150, 150); 
-    FastLED.show(); 
+    ledcWrite(0, 0);
+    ledcWrite(1, 150);
+    ledcWrite(2, 150);
     IrSender.sendNECMSB(0xFFB04F, 32, false);
 }
 void Magenta() { 
     Serial.println("Magenta called");
     Clear(); 
-    leds[0].setRGB(200, 0, 140); 
-    FastLED.show(); 
+    ledcWrite(0, 200);
+    ledcWrite(1, 0);
+    ledcWrite(2, 140);
     IrSender.sendNECMSB(0xFF30CF, 32, false);
 }
 void White() { 
     Serial.println("White called");
-    leds[0].setRGB(140, 140, 140); 
-    FastLED.show(); 
+    ledcWrite(0, 140);
+    ledcWrite(1, 140);
+    ledcWrite(2, 140);
     IrSender.sendNECMSB(0xFF708F, 32, false);
 }
 void Off() { 
