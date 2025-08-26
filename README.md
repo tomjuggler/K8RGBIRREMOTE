@@ -1,17 +1,17 @@
 # Bluetooth K8 IR RGB Remote
 
-A wireless remote control for RGB LED strips using an ESP32C3 microcontroller. This project allows you to control RGB lighting via a web interface and sends corresponding IR signals for compatibility with IR-controlled LED strips.
+A wireless remote control for K8 Juggling Equipment using an ESP32C3 microcontroller. 
 
 ## Features
 
 - Web-based control interface accessible via WiFi
-- IR signal transmission for controlling IR-enabled RGB strips
+- IR signal transmission for controlling IR-enabled K8 equipment
 - Built-in RGB LED for local feedback (optional)
 - Captive portal for easy connection
 
 ## Hardware Requirements
 
-- DFRobot Beetle ESP32C3 board
+- DFRobot Beetle ESP32C3 board (compatible with ESP32 C3 SuperMini)
 - IR LED (for transmitting signals)
 - Common cathode analog RGB LED (for local feedback)
 - Resistors (appropriate for your LEDs)
@@ -20,20 +20,20 @@ A wireless remote control for RGB LED strips using an ESP32C3 microcontroller. T
 ## Wiring
 
 ### IR LED
-- Connect the anode of the IR LED to pin 4 (kIrLedPin) through a current-limiting resistor (typically 100-220Ω)
+- Connect the anode of the IR LED to pin 4 (kIrLedPin) 
 - Connect the cathode to ground
 
 ### Analog RGB LED (Common Cathode)
 - Connect the common cathode to ground
-- Connect the red anode to pin 0 (rPin) through a 220Ω resistor
-- Connect the green anode to pin 1 (gPin) through a 220Ω resistor
-- Connect the blue anode to pin 2 (bPin) through a 220Ω resistor
+- Connect the red anode to pin 0 (rPin) 
+- Connect the green anode to pin 1 (gPin) 
+- Connect the blue anode to pin 2 (bPin) 
 
 ## Installation
 
 1. Install PlatformIO (VSCode extension or standalone)
 2. Clone this repository
-3. Connect your DFRobot Beetle ESP32C3 via USB
+3. Connect your DFRobot Beetle ESP32C3 (or C3 SuperMini) via USB
 4. Build and upload the project
 
 ### PlatformIO Commands
@@ -52,7 +52,7 @@ pio device monitor
 
 1. Power on the device
 2. Connect to the "K8_RGB_IR_REMOTE" WiFi network from your device
-3. Open a web browser and navigate to any page (you'll be redirected to the control interface)
+3. Open a web browser and navigate to any page (you'll be redirected to the control interface). If that does not work, try http://192.168.4.1
 4. Use the buttons to control your RGB lights:
    - Color buttons (Red, Green, Blue, etc.) change the color
    - Effect buttons (Fade, Strobe, Rainbow, etc.) activate different lighting modes
