@@ -320,7 +320,7 @@ void ChineseRed() {
 }
 void ChineseGreen() { 
     Serial.println("ChineseGreen called");
-    IrSender.sendNECMSB(0x00F720DF, 32, false); // Note: Same code as Red, as per file
+    IrSender.sendNECMSB(0x00F7A05F, 32, false);
 }
 void ChineseBlue() { 
     Serial.println("ChineseBlue called");
@@ -328,37 +328,37 @@ void ChineseBlue() {
 }
 void ChineseWhite() { 
     Serial.println("ChineseWhite called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code as Blue
+    IrSender.sendNECMSB(0x00F7E01F, 32, false);
 }
 void ChineseBRTUp() { 
     Serial.println("ChineseBRTUp called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+    IrSender.sendNECMSB(0x00F700FF, 32, false);
 }
 void ChineseBRTDown() { 
     Serial.println("ChineseBRTDown called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+    IrSender.sendNECMSB(0x00F7807F, 32, false);
 }
 void ChineseOFF() { 
     Serial.println("ChineseOFF called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+    IrSender.sendNECMSB(0x00F740BF, 32, false);
 }
 void ChineseON() { 
     Serial.println("ChineseON called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+    IrSender.sendNECMSB(0x00F7C03F, 32, false);
 }
 void ChineseFLASH() { 
     Serial.println("ChineseFLASH called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+    IrSender.sendNECMSB(0x00F7D02F, 32, false);
 }
 void ChineseSTROBE() { 
     Serial.println("ChineseSTROBE called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+    IrSender.sendNECMSB(0x00F7F00F, 32, false);
 }
 void ChineseFADE() { 
     Serial.println("ChineseFADE called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+    IrSender.sendNECMSB(0x00F7C837, 32, false);
 }
 void ChineseSMOOTH() { 
     Serial.println("ChineseSMOOTH called");
-    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+    IrSender.sendNECMSB(0x00F7E817, 32, false);
 }
