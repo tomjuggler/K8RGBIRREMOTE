@@ -217,8 +217,7 @@ void setup() {
     WiFi.onEvent(WiFiEvent);
     WiFi.mode(WIFI_AP);
     WiFi.softAP("K8_RGB_IR_REMOTE", NULL, 1, 0, 4);
-    WiFi.setTxPower(WIFI_POWER_19_5dBm);
-    
+    WiFi.setTxPower(WIFI_POWER_8_5dBm);    
     Serial.print("AP IP address: ");
     Serial.println(WiFi.softAPIP());
 
