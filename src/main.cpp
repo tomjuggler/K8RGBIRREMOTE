@@ -26,6 +26,11 @@ const char INDEX_HTML[] = R"rawliteral(
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #2c2c2c; color: white; text-align: center; }
         .container { padding: 20px; max-width: 800px; margin: 0 auto; }
         h1 { margin-bottom: 30px; }
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #444; }
+        .tab-button { padding: 10px 20px; background: #555; border: none; color: white; cursor: pointer; border-radius: 5px 5px 0 0; margin-right: 5px; }
+        .tab-button.active { background: #777; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; }
         .btn { padding: 20px; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; color: white; cursor: pointer; transition: transform 0.1s ease; }
         .btn:active { transform: scale(0.95); }
@@ -43,29 +48,65 @@ const char INDEX_HTML[] = R"rawliteral(
 <body>
     <div class="container">
         <h1>K8 RGB IR Remote</h1>
-        <div class="grid" id="button-grid">
-            <button class="btn red" data-action="red">Red</button>
-            <button class="btn green" data-action="green">Green</button>
-            <button class="btn blue" data-action="blue">Blue</button>
-            <button class="btn yellow" data-action="yellow">Yellow</button>
-            <button class="btn cyan" data-action="cyan">Cyan</button>
-            <button class="btn magenta" data-action="magenta">Magenta</button>
-            <button class="btn white" data-action="white">White</button>
-            <button class="btn dark" data-action="off">Off</button>
-            <button class="btn gray" data-action="fade">Fade</button>
-            <button class="btn gray" data-action="strobeplus">Strobe+</button>
-            <button class="btn gray" data-action="rgbstrobe">RGB Strobe</button>
-            <button class="btn gray" data-action="rainbow">Rainbow</button>
-            <button class="btn gray" data-action="halfstrobe">Half Strobe</button>
-            <button class="btn gray" data-action="bgstrobe">BG Strobe</button>
-            <button class="btn gray" data-action="grstrobe">GR Strobe</button>
-            <button class="btn gray" data-action="next">Next</button>
-            <button class="btn gray" data-action="demo">Demo</button>
-            <button class="btn gray" data-action="previous">Previous</button>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="k8-tab">K8 Remote</button>
+            <button class="tab-button" data-tab="chinese-tab">Chinese Remote</button>
+        </div>
+        <div id="k8-tab" class="tab-content active">
+            <div class="grid" id="button-grid-k8">
+                <button class="btn red" data-action="red">Red</button>
+                <button class="btn green" data-action="green">Green</button>
+                <button class="btn blue" data-action="blue">Blue</button>
+                <button class="btn yellow" data-action="yellow">Yellow</button>
+                <button class="btn cyan" data-action="cyan">Cyan</button>
+                <button class="btn magenta" data-action="magenta">Magenta</button>
+                <button class="btn white" data-action="white">White</button>
+                <button class="btn dark" data-action="off">Off</button>
+                <button class="btn gray" data-action="fade">Fade</button>
+                <button class="btn gray" data-action="strobeplus">Strobe+</button>
+                <button class="btn gray" data-action="rgbstrobe">RGB Strobe</button>
+                <button class="btn gray" data-action="rainbow">Rainbow</button>
+                <button class="btn gray" data-action="halfstrobe">Half Strobe</button>
+                <button class="btn gray" data-action="bgstrobe">BG Strobe</button>
+                <button class="btn gray" data-action="grstrobe">GR Strobe</button>
+                <button class="btn gray" data-action="next">Next</button>
+                <button class="btn gray" data-action="demo">Demo</button>
+                <button class="btn gray" data-action="previous">Previous</button>
+            </div>
+        </div>
+        <div id="chinese-tab" class="tab-content">
+            <div class="grid" id="button-grid-chinese">
+                <button class="btn red" data-action="chinese_red">Red</button>
+                <button class="btn green" data-action="chinese_green">Green</button>
+                <button class="btn blue" data-action="chinese_blue">Blue</button>
+                <button class="btn white" data-action="chinese_white">White</button>
+                <button class="btn gray" data-action="chinese_brt_up">BRT Up</button>
+                <button class="btn gray" data-action="chinese_brt_down">BRT Down</button>
+                <button class="btn dark" data-action="chinese_off">OFF</button>
+                <button class="btn gray" data-action="chinese_on">ON</button>
+                <button class="btn gray" data-action="chinese_flash">FLASH</button>
+                <button class="btn gray" data-action="chinese_strobe">STROBE</button>
+                <button class="btn gray" data-action="chinese_fade">FADE</button>
+                <button class="btn gray" data-action="chinese_smooth">SMOOTH</button>
+            </div>
         </div>
     </div>
     <script>
-        document.getElementById('button-grid').addEventListener('click', (event) => {
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                button.classList.add('active');
+                document.getElementById(button.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Button click handling for both grids
+        document.getElementById('button-grid-k8').addEventListener('click', handleButtonClick);
+        document.getElementById('button-grid-chinese').addEventListener('click', handleButtonClick);
+
+        function handleButtonClick(event) {
             if (event.target.tagName === 'BUTTON') {
                 const action = event.target.dataset.action;
                 fetch(`/action?do=${action}`)
@@ -76,7 +117,7 @@ const char INDEX_HTML[] = R"rawliteral(
                     })
                     .catch(error => console.error('Fetch error:', error));
             }
-        });
+        }
     </script>
 </body>
 </html>
@@ -87,6 +128,9 @@ void Clear();
 void Red(); void Green(); void Blue(); void Yellow(); void Cyan(); void Magenta(); void White();
 void Off(); void Fade(); void Strobeplus(); void RGBStrobe(); void Rainbow();
 void Halfstrobe(); void BGStrobe(); void GRStrobe(); void Next(); void Demo(); void Previous();
+void ChineseRed(); void ChineseGreen(); void ChineseBlue(); void ChineseWhite();
+void ChineseBRTUp(); void ChineseBRTDown(); void ChineseOFF(); void ChineseON();
+void ChineseFLASH(); void ChineseSTROBE(); void ChineseFADE(); void ChineseSMOOTH();
 
 void handleRoot() {
     server.send(200, "text/html", INDEX_HTML);
@@ -112,6 +156,18 @@ void handleAction() {
     else if (action == "next") Next();
     else if (action == "demo") Demo();
     else if (action == "previous") Previous();
+    else if (action == "chinese_red") ChineseRed();
+    else if (action == "chinese_green") ChineseGreen();
+    else if (action == "chinese_blue") ChineseBlue();
+    else if (action == "chinese_white") ChineseWhite();
+    else if (action == "chinese_brt_up") ChineseBRTUp();
+    else if (action == "chinese_brt_down") ChineseBRTDown();
+    else if (action == "chinese_off") ChineseOFF();
+    else if (action == "chinese_on") ChineseON();
+    else if (action == "chinese_flash") ChineseFLASH();
+    else if (action == "chinese_strobe") ChineseSTROBE();
+    else if (action == "chinese_fade") ChineseFADE();
+    else if (action == "chinese_smooth") ChineseSMOOTH();
     else {
         server.send(400, "text/plain", "Invalid action");
         return;
@@ -256,4 +312,53 @@ void Demo() {
 void Previous() { 
     Serial.println("Previous called");
     IrSender.sendNECMSB(0xFFA05F, 32, false);
+}
+
+void ChineseRed() { 
+    Serial.println("ChineseRed called");
+    IrSender.sendNECMSB(0x00F720DF, 32, false);
+}
+void ChineseGreen() { 
+    Serial.println("ChineseGreen called");
+    IrSender.sendNECMSB(0x00F720DF, 32, false); // Note: Same code as Red, as per file
+}
+void ChineseBlue() { 
+    Serial.println("ChineseBlue called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false);
+}
+void ChineseWhite() { 
+    Serial.println("ChineseWhite called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code as Blue
+}
+void ChineseBRTUp() { 
+    Serial.println("ChineseBRTUp called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+}
+void ChineseBRTDown() { 
+    Serial.println("ChineseBRTDown called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+}
+void ChineseOFF() { 
+    Serial.println("ChineseOFF called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+}
+void ChineseON() { 
+    Serial.println("ChineseON called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+}
+void ChineseFLASH() { 
+    Serial.println("ChineseFLASH called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+}
+void ChineseSTROBE() { 
+    Serial.println("ChineseSTROBE called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+}
+void ChineseFADE() { 
+    Serial.println("ChineseFADE called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
+}
+void ChineseSMOOTH() { 
+    Serial.println("ChineseSMOOTH called");
+    IrSender.sendNECMSB(0x00F7609F, 32, false); // Same code
 }
