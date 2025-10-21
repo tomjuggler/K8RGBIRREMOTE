@@ -10,6 +10,26 @@ const uint16_t rPin = 0;
 const uint16_t gPin = 1;
 const uint16_t bPin = 2;
 
+// --- WiFi Event Handler ---
+void WiFiEvent(WiFiEvent_t event) {
+    switch(event) {
+        case SYSTEM_EVENT_AP_START:
+            Serial.println("AP Started");
+            break;
+        case SYSTEM_EVENT_AP_STOP:
+            Serial.println("AP Stopped");
+            break;
+        case SYSTEM_EVENT_AP_STACONNECTED:
+            Serial.println("Client Connected");
+            break;
+        case SYSTEM_EVENT_AP_STADISCONNECTED:
+            Serial.println("Client Disconnected");
+            break;
+        default:
+            break;
+    }
+}
+
 // --- Objects ---
 DNSServer dnsServer;
 WebServer server(80);
@@ -193,8 +213,12 @@ void setup() {
     // Setup IR Sender
     IrSender.begin(kIrLedPin);
 
-    // Setup WiFi AP
-    WiFi.softAP("K8_RGB_IR_REMOTE");
+    // Improved WiFi AP Setup
+    WiFi.onEvent(WiFiEvent);
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP("K8_RGB_IR_REMOTE", NULL, 1, 0, 4);
+    WiFi.setTxPower(WIFI_POWER_19_5dBm);
+    
     Serial.print("AP IP address: ");
     Serial.println(WiFi.softAPIP());
 
@@ -204,15 +228,27 @@ void setup() {
     // Setup Web Server
     server.on("/", HTTP_GET, handleRoot);
     server.on("/action", HTTP_GET, handleAction);
-    server.onNotFound(handleNotFound); // Captive portal redirect
+    server.onNotFound(handleNotFound);
     server.begin();
 
     Serial.println("HTTP server started");
 }
 
+unsigned long lastStatusCheck = 0;
+
 void loop() {
     dnsServer.processNextRequest();
     server.handleClient();
+    
+    // Print status every 30 seconds
+    if (millis() - lastStatusCheck > 30000) {
+        lastStatusCheck = millis();
+        Serial.printf("AP Status - IP: %s, Clients: %d\n", 
+                     WiFi.softAPIP().toString().c_str(), 
+                     WiFi.softAPgetStationNum());
+    }
+    
+    delay(10);
 }
 
 // --- Color and Command Functions ---
