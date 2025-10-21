@@ -352,18 +352,28 @@ void Previous() {
 
 void ChineseRed() { 
     Serial.println("ChineseRed called");
+    Clear(); 
+    digitalWrite(rPin, HIGH);
     IrSender.sendNECMSB(0x00F720DF, 32, false);
 }
 void ChineseGreen() { 
     Serial.println("ChineseGreen called");
+    Clear(); 
+    digitalWrite(gPin, HIGH);
     IrSender.sendNECMSB(0x00F7A05F, 32, false);
 }
 void ChineseBlue() { 
     Serial.println("ChineseBlue called");
+    Clear(); 
+    digitalWrite(bPin, HIGH);
     IrSender.sendNECMSB(0x00F7609F, 32, false);
 }
 void ChineseWhite() { 
     Serial.println("ChineseWhite called");
+    Clear(); 
+    digitalWrite(rPin, HIGH);
+    digitalWrite(gPin, HIGH);
+    digitalWrite(bPin, HIGH);
     IrSender.sendNECMSB(0x00F7E01F, 32, false);
 }
 void ChineseBRTUp() { 
