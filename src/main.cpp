@@ -11,23 +11,9 @@ const uint16_t rPin = 0;
 const uint16_t gPin = 1;
 const uint16_t bPin = 2;
 
-// --- Testing Configuration ---
-bool testing = false;
-unsigned long test_delay = 100;
-unsigned long last_toggle_time = 0;
-bool current_color_state = false; // false = first color, true = second color
+unsigned long color_pair_delay = 500; // ms delay between color commands
 
-// Extra function modes
-enum ExtraMode {
-  EXTRA_NONE = 0,
-  EXTRA_RED_BLUE,
-  EXTRA_RED_GREEN,
-  EXTRA_RED_WHITE,
-  EXTRA_GREEN_BLUE,
-  EXTRA_GREEN_WHITE,
-  EXTRA_BLUE_WHITE
-};
-ExtraMode current_extra_mode = EXTRA_NONE;
+
 // --- WiFi Event Handler ---
 void WiFiEvent(WiFiEvent_t event) {
     switch(event) {
@@ -164,8 +150,8 @@ void handleSetSpeed() {
     if (speedStr.length() > 0) {
         unsigned long newDelay = speedStr.toInt();
         if (newDelay >= 100 && newDelay <= 5000) {
-            test_delay = newDelay;
-            Serial.printf("Speed set to %lums\\n", test_delay);
+            color_pair_delay = newDelay;
+            Serial.printf("Speed set to %lums\\n", color_pair_delay);
             server.send(200, "text/plain", "OK");
         } else {
             server.send(400, "text/plain", "Speed must be between 100 and 5000ms");
@@ -214,45 +200,6 @@ void setup() {
 unsigned long lastStatusCheck = 0;
 
 void loop() {
-    if (testing && current_extra_mode != EXTRA_NONE) {
-        unsigned long now = millis();
-        if (now - last_toggle_time >= test_delay) {
-            last_toggle_time = now;
-            current_color_state = !current_color_state;
-            
-            switch(current_extra_mode) {
-                case EXTRA_RED_BLUE:
-                    if (current_color_state) ChineseBlue();
-                    else ChineseRed();
-                    break;
-                case EXTRA_RED_GREEN:
-                    if (current_color_state) ChineseGreen();
-                    else ChineseRed();
-                    break;
-                case EXTRA_RED_WHITE:
-                    if (current_color_state) ChineseWhite();
-                    else ChineseRed();
-                    break;
-                case EXTRA_GREEN_BLUE:
-                    if (current_color_state) ChineseBlue();
-                    else ChineseGreen();
-                    break;
-                case EXTRA_GREEN_WHITE:
-                    if (current_color_state) ChineseWhite();
-                    else ChineseGreen();
-                    break;
-                case EXTRA_BLUE_WHITE:
-                    if (current_color_state) ChineseWhite();
-                    else ChineseBlue();
-                    break;
-                default:
-                    testing = false;
-                    current_extra_mode = EXTRA_NONE;
-                    break;
-            }
-        }
-        return;
-    }
     dnsServer.processNextRequest();
     server.handleClient();
     
@@ -427,45 +374,39 @@ void ChineseSMOOTH() {
 
 void extra_red_blue() {
     Serial.println("extra_red_blue called");
-    testing = true;
-    current_extra_mode = EXTRA_RED_BLUE;
-    current_color_state = false;
-    last_toggle_time = millis();
+    ChineseRed();
+    delay(color_pair_delay);
+    ChineseBlue();
 }
 void extra_red_green() {
     Serial.println("extra_red_green called");
-    testing = true;
-    current_extra_mode = EXTRA_RED_GREEN;
-    current_color_state = false;
-    last_toggle_time = millis();
+    ChineseRed();
+    delay(color_pair_delay);
+    ChineseGreen();
 }
 void extra_red_white() {
     Serial.println("extra_red_white called");
-    testing = true;
-    current_extra_mode = EXTRA_RED_WHITE;
-    current_color_state = false;
-    last_toggle_time = millis();
+    ChineseRed();
+    delay(color_pair_delay);
+    ChineseWhite();
 }
 void extra_green_blue() {
     Serial.println("extra_green_blue called");
-    testing = true;
-    current_extra_mode = EXTRA_GREEN_BLUE;
-    current_color_state = false;
-    last_toggle_time = millis();
+    ChineseGreen();
+    delay(color_pair_delay);
+    ChineseBlue();
 }
 void extra_green_white() {
     Serial.println("extra_green_white called");
-    testing = true;
-    current_extra_mode = EXTRA_GREEN_WHITE;
-    current_color_state = false;
-    last_toggle_time = millis();
+    ChineseGreen();
+    delay(color_pair_delay);
+    ChineseWhite();
 }
 void extra_blue_white() {
     Serial.println("extra_blue_white called");
-    testing = true;
-    current_extra_mode = EXTRA_BLUE_WHITE;
-    current_color_state = false;
-    last_toggle_time = millis();
+    ChineseBlue();
+    delay(color_pair_delay);
+    ChineseWhite();
 }
 
 String loadIndexHtml() {
