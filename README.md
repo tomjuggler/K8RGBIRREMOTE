@@ -44,6 +44,12 @@ pio run
 # Upload to the board
 pio run --target upload
 
+# Build Filesystem
+pio run --target buildfs
+
+# Upload Filesystem
+pio run --target uploadfs
+
 # Monitor serial output
 pio device monitor
 ```
