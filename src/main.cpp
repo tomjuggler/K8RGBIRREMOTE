@@ -10,6 +10,9 @@ const uint16_t rPin = 0;
 const uint16_t gPin = 1;
 const uint16_t bPin = 2;
 
+// --- Testing Configuration ---
+bool testing = false;
+unsigned long test_delay = 200;
 // --- WiFi Event Handler ---
 void WiFiEvent(WiFiEvent_t event) {
     switch(event) {
@@ -151,6 +154,7 @@ void Halfstrobe(); void BGStrobe(); void GRStrobe(); void Next(); void Demo(); v
 void ChineseRed(); void ChineseGreen(); void ChineseBlue(); void ChineseWhite();
 void ChineseBRTUp(); void ChineseBRTDown(); void ChineseOFF(); void ChineseON();
 void ChineseFLASH(); void ChineseSTROBE(); void ChineseFADE(); void ChineseSMOOTH();
+void test_red_blue();
 
 void handleRoot() {
     server.send(200, "text/html", INDEX_HTML);
@@ -236,6 +240,10 @@ void setup() {
 unsigned long lastStatusCheck = 0;
 
 void loop() {
+    if (testing) {
+        test_red_blue();
+        return;
+    }
     dnsServer.processNextRequest();
     server.handleClient();
     
@@ -406,4 +414,11 @@ void ChineseFADE() {
 void ChineseSMOOTH() { 
     Serial.println("ChineseSMOOTH called");
     IrSender.sendNECMSB(0x00F7E817, 32, false);
+}
+
+void test_red_blue() {
+    ChineseRed();
+    delay(test_delay);
+    ChineseBlue();
+    delay(test_delay);
 }
