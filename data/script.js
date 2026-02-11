@@ -24,3 +24,33 @@ function handleButtonClick(event) {
             .catch(error => console.error('Fetch error:', error));
     }
 }
+\n// Speed slider with debounce
+let speedSliderTimeout = null;
+const speedSlider = document.getElementById('speed-slider');
+const speedValue = document.getElementById('speed-value');
+
+speedSlider.addEventListener('input', function() {
+    speedValue.textContent = this.value;
+
+    // Clear any existing timeout
+    if (speedSliderTimeout) {
+        clearTimeout(speedSliderTimeout);
+    }
+
+    // Set new timeout to update after slider stops
+    speedSliderTimeout = setTimeout(() => {
+        updateSpeed(this.value);
+    }, 300); // Update 300ms after last change
+});
+
+function updateSpeed(speedMs) {
+    fetch(`/set_speed?speed=${speedMs}`)
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error setting speed');
+            } else {
+                console.log(`Speed set to ${speedMs}ms`);
+            }
+        })
+        .catch(error => console.error('Fetch error:', error));
+}

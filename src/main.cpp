@@ -14,6 +14,20 @@ const uint16_t bPin = 2;
 // --- Testing Configuration ---
 bool testing = false;
 unsigned long test_delay = 100;
+unsigned long last_toggle_time = 0;
+bool current_color_state = false; // false = first color, true = second color
+
+// Extra function modes
+enum ExtraMode {
+  EXTRA_NONE = 0,
+  EXTRA_RED_BLUE,
+  EXTRA_RED_GREEN,
+  EXTRA_RED_WHITE,
+  EXTRA_GREEN_BLUE,
+  EXTRA_GREEN_WHITE,
+  EXTRA_BLUE_WHITE
+};
+ExtraMode current_extra_mode = EXTRA_NONE;
 // --- WiFi Event Handler ---
 void WiFiEvent(WiFiEvent_t event) {
     switch(event) {
@@ -48,10 +62,11 @@ void Halfstrobe(); void BGStrobe(); void GRStrobe(); void Next(); void Demo(); v
 void ChineseRed(); void ChineseGreen(); void ChineseBlue(); void ChineseWhite();
 void ChineseBRTUp(); void ChineseBRTDown(); void ChineseOFF(); void ChineseON();
 void ChineseFLASH(); void ChineseSTROBE(); void ChineseFADE(); void ChineseSMOOTH();
-void test_red_blue();
+void extra_red_blue(); void extra_red_green(); void extra_red_white(); void extra_green_blue(); void extra_green_white(); void extra_blue_white();
 String loadIndexHtml();
 void handleStyle();
 void handleScript();
+void handleSetSpeed();
 
 void handleRoot() {
     String htmlContent = loadIndexHtml();
@@ -90,6 +105,12 @@ void handleAction() {
     else if (action == "chinese_strobe") ChineseSTROBE();
     else if (action == "chinese_fade") ChineseFADE();
     else if (action == "chinese_smooth") ChineseSMOOTH();
+    else if (action == "extra_red_blue") extra_red_blue();
+    else if (action == "extra_red_green") extra_red_green();
+    else if (action == "extra_red_white") extra_red_white();
+    else if (action == "extra_green_blue") extra_green_blue();
+    else if (action == "extra_green_white") extra_green_white();
+    else if (action == "extra_blue_white") extra_blue_white();
     else {
         server.send(400, "text/plain", "Invalid action");
         return;
@@ -138,6 +159,22 @@ void handleScript() {
   file.close();
 }
 
+void handleSetSpeed() {
+    String speedStr = server.arg("speed");
+    if (speedStr.length() > 0) {
+        unsigned long newDelay = speedStr.toInt();
+        if (newDelay >= 100 && newDelay <= 5000) {
+            test_delay = newDelay;
+            Serial.printf("Speed set to %lums\\n", test_delay);
+            server.send(200, "text/plain", "OK");
+        } else {
+            server.send(400, "text/plain", "Speed must be between 100 and 5000ms");
+        }
+    } else {
+        server.send(400, "text/plain", "Missing speed parameter");
+    }
+}
+
 void setup() {
     Serial.begin(115200);
     Serial.println("Starting...");
@@ -167,6 +204,7 @@ void setup() {
     server.on("/action", HTTP_GET, handleAction);
     server.on("/style.css", HTTP_GET, handleStyle);
     server.on("/script.js", HTTP_GET, handleScript);
+    server.on("/set_speed", HTTP_GET, handleSetSpeed);
     server.onNotFound(handleNotFound);
     server.begin();
 
@@ -176,8 +214,43 @@ void setup() {
 unsigned long lastStatusCheck = 0;
 
 void loop() {
-    if (testing) {
-        test_red_blue();
+    if (testing && current_extra_mode != EXTRA_NONE) {
+        unsigned long now = millis();
+        if (now - last_toggle_time >= test_delay) {
+            last_toggle_time = now;
+            current_color_state = !current_color_state;
+            
+            switch(current_extra_mode) {
+                case EXTRA_RED_BLUE:
+                    if (current_color_state) ChineseBlue();
+                    else ChineseRed();
+                    break;
+                case EXTRA_RED_GREEN:
+                    if (current_color_state) ChineseGreen();
+                    else ChineseRed();
+                    break;
+                case EXTRA_RED_WHITE:
+                    if (current_color_state) ChineseWhite();
+                    else ChineseRed();
+                    break;
+                case EXTRA_GREEN_BLUE:
+                    if (current_color_state) ChineseBlue();
+                    else ChineseGreen();
+                    break;
+                case EXTRA_GREEN_WHITE:
+                    if (current_color_state) ChineseWhite();
+                    else ChineseGreen();
+                    break;
+                case EXTRA_BLUE_WHITE:
+                    if (current_color_state) ChineseWhite();
+                    else ChineseBlue();
+                    break;
+                default:
+                    testing = false;
+                    current_extra_mode = EXTRA_NONE;
+                    break;
+            }
+        }
         return;
     }
     dnsServer.processNextRequest();
@@ -352,6 +425,49 @@ void ChineseSMOOTH() {
     IrSender.sendNECMSB(0x00F7E817, 32, false);
 }
 
+void extra_red_blue() {
+    Serial.println("extra_red_blue called");
+    testing = true;
+    current_extra_mode = EXTRA_RED_BLUE;
+    current_color_state = false;
+    last_toggle_time = millis();
+}
+void extra_red_green() {
+    Serial.println("extra_red_green called");
+    testing = true;
+    current_extra_mode = EXTRA_RED_GREEN;
+    current_color_state = false;
+    last_toggle_time = millis();
+}
+void extra_red_white() {
+    Serial.println("extra_red_white called");
+    testing = true;
+    current_extra_mode = EXTRA_RED_WHITE;
+    current_color_state = false;
+    last_toggle_time = millis();
+}
+void extra_green_blue() {
+    Serial.println("extra_green_blue called");
+    testing = true;
+    current_extra_mode = EXTRA_GREEN_BLUE;
+    current_color_state = false;
+    last_toggle_time = millis();
+}
+void extra_green_white() {
+    Serial.println("extra_green_white called");
+    testing = true;
+    current_extra_mode = EXTRA_GREEN_WHITE;
+    current_color_state = false;
+    last_toggle_time = millis();
+}
+void extra_blue_white() {
+    Serial.println("extra_blue_white called");
+    testing = true;
+    current_extra_mode = EXTRA_BLUE_WHITE;
+    current_color_state = false;
+    last_toggle_time = millis();
+}
+
 String loadIndexHtml() {
   if (!LittleFS.begin()) {
     Serial.println("An error occurred while mounting LittleFS");
@@ -367,12 +483,4 @@ String loadIndexHtml() {
   String content = file.readString();
   file.close();
   return content;
-}
-
-void test_red_blue() {
-    ChineseRed();
-    delay(test_delay);
-    ChineseBlue();
-    delay(test_delay);
-    yield();
 }
