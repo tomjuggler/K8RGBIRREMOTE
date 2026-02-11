@@ -11,7 +11,13 @@ const uint16_t rPin = 0;
 const uint16_t gPin = 1;
 const uint16_t bPin = 2;
 
+
 unsigned long color_pair_delay = 500; // ms delay between color commands
+
+// Pattern control variables
+int currentPattern = 0; // 0=off, 1=red_blue, 2=red_green, 3=red_white, 4=green_blue, 5=green_white, 6=blue_white
+int patternState = 0; // 0=first color, 1=second color
+unsigned long lastPatternTime = 0;
 
 
 // --- WiFi Event Handler ---
@@ -49,6 +55,7 @@ void ChineseRed(); void ChineseGreen(); void ChineseBlue(); void ChineseWhite();
 void ChineseBRTUp(); void ChineseBRTDown(); void ChineseOFF(); void ChineseON();
 void ChineseFLASH(); void ChineseSTROBE(); void ChineseFADE(); void ChineseSMOOTH();
 void extra_red_blue(); void extra_red_green(); void extra_red_white(); void extra_green_blue(); void extra_green_white(); void extra_blue_white();
+void handlePattern();
 String loadIndexHtml();
 void handleStyle();
 void handleScript();
@@ -61,36 +68,36 @@ void handleRoot() {
 
 void handleAction() {
     String action = server.arg("do");
-    if (action == "red") Red();
-    else if (action == "green") Green();
-    else if (action == "blue") Blue();
-    else if (action == "yellow") Yellow();
-    else if (action == "cyan") Cyan();
-    else if (action == "magenta") Magenta();
-    else if (action == "white") White();
-    else if (action == "off") Off();
-    else if (action == "fade") Fade();
-    else if (action == "strobeplus") Strobeplus();
-    else if (action == "rgbstrobe") RGBStrobe();
-    else if (action == "rainbow") Rainbow();
-    else if (action == "halfstrobe") Halfstrobe();
-    else if (action == "bgstrobe") BGStrobe();
-    else if (action == "grstrobe") GRStrobe();
-    else if (action == "next") Next();
-    else if (action == "demo") Demo();
-    else if (action == "previous") Previous();
-    else if (action == "chinese_red") ChineseRed();
-    else if (action == "chinese_green") ChineseGreen();
-    else if (action == "chinese_blue") ChineseBlue();
-    else if (action == "chinese_white") ChineseWhite();
-    else if (action == "chinese_brt_up") ChineseBRTUp();
-    else if (action == "chinese_brt_down") ChineseBRTDown();
-    else if (action == "chinese_off") ChineseOFF();
-    else if (action == "chinese_on") ChineseON();
-    else if (action == "chinese_flash") ChineseFLASH();
-    else if (action == "chinese_strobe") ChineseSTROBE();
-    else if (action == "chinese_fade") ChineseFADE();
-    else if (action == "chinese_smooth") ChineseSMOOTH();
+    if (action == "red") { currentPattern = 0; patternState = 0; Red(); }
+    else if (action == "green") { currentPattern = 0; patternState = 0; Green(); }
+    else if (action == "blue") { currentPattern = 0; patternState = 0; Blue(); }
+    else if (action == "yellow") { currentPattern = 0; patternState = 0; Yellow(); }
+    else if (action == "cyan") { currentPattern = 0; patternState = 0; Cyan(); }
+    else if (action == "magenta") { currentPattern = 0; patternState = 0; Magenta(); }
+    else if (action == "white") { currentPattern = 0; patternState = 0; White(); }
+    else if (action == "off") { currentPattern = 0; patternState = 0; Off(); }
+    else if (action == "fade") { currentPattern = 0; patternState = 0; Fade(); }
+    else if (action == "strobeplus") { currentPattern = 0; patternState = 0; Strobeplus(); }
+    else if (action == "rgbstrobe") { currentPattern = 0; patternState = 0; RGBStrobe(); }
+    else if (action == "rainbow") { currentPattern = 0; patternState = 0; Rainbow(); }
+    else if (action == "halfstrobe") { currentPattern = 0; patternState = 0; Halfstrobe(); }
+    else if (action == "bgstrobe") { currentPattern = 0; patternState = 0; BGStrobe(); }
+    else if (action == "grstrobe") { currentPattern = 0; patternState = 0; GRStrobe(); }
+    else if (action == "next") { currentPattern = 0; patternState = 0; Next(); }
+    else if (action == "demo") { currentPattern = 0; patternState = 0; Demo(); }
+    else if (action == "previous") { currentPattern = 0; patternState = 0; Previous(); }
+    else if (action == "chinese_red") { currentPattern = 0; patternState = 0; ChineseRed(); }
+    else if (action == "chinese_green") { currentPattern = 0; patternState = 0; ChineseGreen(); }
+    else if (action == "chinese_blue") { currentPattern = 0; patternState = 0; ChineseBlue(); }
+    else if (action == "chinese_white") { currentPattern = 0; patternState = 0; ChineseWhite(); }
+    else if (action == "chinese_brt_up") { currentPattern = 0; patternState = 0; ChineseBRTUp(); }
+    else if (action == "chinese_brt_down") { currentPattern = 0; patternState = 0; ChineseBRTDown(); }
+    else if (action == "chinese_off") { currentPattern = 0; patternState = 0; ChineseOFF(); }
+    else if (action == "chinese_on") { currentPattern = 0; patternState = 0; ChineseON(); }
+    else if (action == "chinese_flash") { currentPattern = 0; patternState = 0; ChineseFLASH(); }
+    else if (action == "chinese_strobe") { currentPattern = 0; patternState = 0; ChineseSTROBE(); }
+    else if (action == "chinese_fade") { currentPattern = 0; patternState = 0; ChineseFADE(); }
+    else if (action == "chinese_smooth") { currentPattern = 0; patternState = 0; ChineseSMOOTH(); }
     else if (action == "extra_red_blue") extra_red_blue();
     else if (action == "extra_red_green") extra_red_green();
     else if (action == "extra_red_white") extra_red_white();
@@ -202,6 +209,7 @@ unsigned long lastStatusCheck = 0;
 void loop() {
     dnsServer.processNextRequest();
     server.handleClient();
+    handlePattern();
     
     // Print status every 30 seconds
     if (millis() - lastStatusCheck > 30000) {
@@ -212,6 +220,76 @@ void loop() {
     }
     
     delay(10);
+}
+
+void handlePattern() {
+    if (currentPattern == 0) return;
+
+    unsigned long now = millis();
+    if (now - lastPatternTime >= color_pair_delay) {
+        lastPatternTime = now;
+
+        switch (currentPattern) {
+            case 1: // red_blue
+                if (patternState == 0) {
+                    ChineseRed();
+                    patternState = 1;
+                } else {
+                    ChineseBlue();
+                    patternState = 0;
+                }
+                break;
+            case 2: // red_green
+                if (patternState == 0) {
+                    ChineseRed();
+                    patternState = 1;
+                } else {
+                    ChineseGreen();
+                    patternState = 0;
+                }
+                break;
+            case 3: // red_white
+                if (patternState == 0) {
+                    ChineseRed();
+                    patternState = 1;
+                } else {
+                    ChineseWhite();
+                    patternState = 0;
+                }
+                break;
+            case 4: // green_blue
+                if (patternState == 0) {
+                    ChineseGreen();
+                    patternState = 1;
+                } else {
+                    ChineseBlue();
+                    patternState = 0;
+                }
+                break;
+            case 5: // green_white
+                if (patternState == 0) {
+                    ChineseGreen();
+                    patternState = 1;
+                } else {
+                    ChineseWhite();
+                    patternState = 0;
+                }
+                break;
+            case 6: // blue_white
+                if (patternState == 0) {
+                    ChineseBlue();
+                    patternState = 1;
+                } else {
+                    ChineseWhite();
+                    patternState = 0;
+                }
+                break;
+            default:
+                currentPattern = 0;
+                patternState = 0;
+                break;
+        }
+    }
 }
 
 // --- Color and Command Functions ---
@@ -374,39 +452,45 @@ void ChineseSMOOTH() {
 
 void extra_red_blue() {
     Serial.println("extra_red_blue called");
+    currentPattern = 1;
+    patternState = 0;
+    lastPatternTime = millis();
     ChineseRed();
-    delay(color_pair_delay);
-    ChineseBlue();
 }
 void extra_red_green() {
     Serial.println("extra_red_green called");
+    currentPattern = 2;
+    patternState = 0;
+    lastPatternTime = millis();
     ChineseRed();
-    delay(color_pair_delay);
-    ChineseGreen();
 }
 void extra_red_white() {
     Serial.println("extra_red_white called");
+    currentPattern = 3;
+    patternState = 0;
+    lastPatternTime = millis();
     ChineseRed();
-    delay(color_pair_delay);
-    ChineseWhite();
 }
 void extra_green_blue() {
     Serial.println("extra_green_blue called");
+    currentPattern = 4;
+    patternState = 0;
+    lastPatternTime = millis();
     ChineseGreen();
-    delay(color_pair_delay);
-    ChineseBlue();
 }
 void extra_green_white() {
     Serial.println("extra_green_white called");
+    currentPattern = 5;
+    patternState = 0;
+    lastPatternTime = millis();
     ChineseGreen();
-    delay(color_pair_delay);
-    ChineseWhite();
 }
 void extra_blue_white() {
     Serial.println("extra_blue_white called");
+    currentPattern = 6;
+    patternState = 0;
+    lastPatternTime = millis();
     ChineseBlue();
-    delay(color_pair_delay);
-    ChineseWhite();
 }
 
 String loadIndexHtml() {
