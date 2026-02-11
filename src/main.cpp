@@ -11,8 +11,8 @@ const uint16_t gPin = 1;
 const uint16_t bPin = 2;
 
 // --- Testing Configuration ---
-bool testing = false;
-unsigned long test_delay = 200;
+bool testing = true;
+unsigned long test_delay = 100;
 // --- WiFi Event Handler ---
 void WiFiEvent(WiFiEvent_t event) {
     switch(event) {
@@ -260,7 +260,7 @@ void loop() {
 
 // --- Color and Command Functions ---
 void Clear() { 
-    Serial.println("Clear called");
+    // Serial.println("Clear called");
     digitalWrite(rPin, LOW);
     digitalWrite(gPin, LOW);
     digitalWrite(bPin, LOW);
@@ -421,4 +421,5 @@ void test_red_blue() {
     delay(test_delay);
     ChineseBlue();
     delay(test_delay);
+    yield();
 }
