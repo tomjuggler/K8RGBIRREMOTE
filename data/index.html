@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K8 Remote Control</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>K8 RGB IR Remote</h1>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="k8-tab">K8 Remote</button>
+            <button class="tab-button" data-tab="chinese-tab">Chinese Remote</button>
+        </div>
+        <div id="k8-tab" class="tab-content active">
+            <div class="grid" id="button-grid-k8">
+                <button class="btn red" data-action="red">Red</button>
+                <button class="btn green" data-action="green">Green</button>
+                <button class="btn blue" data-action="blue">Blue</button>
+                <button class="btn yellow" data-action="yellow">Yellow</button>
+                <button class="btn cyan" data-action="cyan">Cyan</button>
+                <button class="btn magenta" data-action="magenta">Magenta</button>
+                <button class="btn white" data-action="white">White</button>
+                <button class="btn dark" data-action="off">Off</button>
+                <button class="btn gray" data-action="fade">Fade</button>
+                <button class="btn gray" data-action="strobeplus">Strobe+</button>
+                <button class="btn gray" data-action="rgbstrobe">RGB Strobe</button>
+                <button class="btn gray" data-action="rainbow">Rainbow</button>
+                <button class="btn gray" data-action="halfstrobe">Half Strobe</button>
+                <button class="btn gray" data-action="bgstrobe">BG Strobe</button>
+                <button class="btn gray" data-action="grstrobe">GR Strobe</button>
+                <button class="btn gray" data-action="next">Next</button>
+                <button class="btn gray" data-action="demo">Demo</button>
+                <button class="btn gray" data-action="previous">Previous</button>
+            </div>
+        </div>
+        <div id="chinese-tab" class="tab-content">
+            <div class="grid" id="button-grid-chinese">
+                <button class="btn red" data-action="chinese_red">Red</button>
+                <button class="btn green" data-action="chinese_green">Green</button>
+                <button class="btn blue" data-action="chinese_blue">Blue</button>
+                <button class="btn white" data-action="chinese_white">White</button>
+                <button class="btn gray" data-action="chinese_brt_up">BRT Up</button>
+                <button class="btn gray" data-action="chinese_brt_down">BRT Down</button>
+                <button class="btn dark" data-action="chinese_off">OFF</button>
+                <button class="btn gray" data-action="chinese_on">ON</button>
+                <button class="btn gray" data-action="chinese_flash">FLASH</button>
+                <button class="btn gray" data-action="chinese_strobe">STROBE</button>
+                <button class="btn gray" data-action="chinese_fade">FADE</button>
+                <button class="btn gray" data-action="chinese_smooth">SMOOTH</button>
+                <button class="btn red" data-action="extra_red_blue">RB Strobe</button>
+                <button class="btn red" data-action="extra_red_green">RG Strobe</button>
+                <button class="btn red" data-action="extra_red_white">RW Strobe</button>
+                <button class="btn green" data-action="extra_green_blue">GB Strobe</button>
+                <button class="btn green" data-action="extra_green_white">GW Strobe</button>
+                <button class="btn blue" data-action="extra_blue_white">BW Strobe</button>
+            </div>
+            <div class="speed-control">
+                <label for="speed-slider">Speed: <span id="speed-value">100</span>ms</label>
+                <input type="range" id="speed-slider" min="100" max="5000" value="100" step="100">
+            </div>
+        </div>
+    </div>
+    <script src="/script.js"></script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <DNSServer.h>
+#include <LittleFS.h>
 #include <IRremote.hpp>
 
 // --- Pin Definitions ---
@@ -9,6 +10,15 @@ const uint16_t kIrLedPin = 4;
 const uint16_t rPin = 0;
 const uint16_t gPin = 1;
 const uint16_t bPin = 2;
+
+
+unsigned long color_pair_delay = 500; // ms delay between color commands
+
+// Pattern control variables
+int currentPattern = 0; // 0=off, 1=red_blue, 2=red_green, 3=red_white, 4=green_blue, 5=green_white, 6=blue_white
+int patternState = 0; // 0=first color, 1=second color
+unsigned long lastPatternTime = 0;
+
 
 // --- WiFi Event Handler ---
 void WiFiEvent(WiFiEvent_t event) {
@@ -35,113 +45,6 @@ DNSServer dnsServer;
 WebServer server(80);
 
 // --- Web Page ---
-const char INDEX_HTML[] = R"rawliteral(
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K8 Remote Control</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #2c2c2c; color: white; text-align: center; }
-        .container { padding: 20px; max-width: 800px; margin: 0 auto; }
-        h1 { margin-bottom: 30px; }
-        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #444; }
-        .tab-button { padding: 10px 20px; background: #555; border: none; color: white; cursor: pointer; border-radius: 5px 5px 0 0; margin-right: 5px; }
-        .tab-button.active { background: #777; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; }
-        .btn { padding: 20px; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; color: white; cursor: pointer; transition: transform 0.1s ease; }
-        .btn:active { transform: scale(0.95); }
-        .red { background-color: #e74c3c; }
-        .green { background-color: #2ecc71; }
-        .blue { background-color: #3498db; }
-        .yellow { background-color: #f1c40f; }
-        .cyan { background-color: #1abc9c; }
-        .magenta { background-color: #9b59b6; }
-        .white { background-color: #ecf0f1; color: #2c3e3c; }
-        .gray { background-color: #7f8c8d; }
-        .dark { background-color: #34495e; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>K8 RGB IR Remote</h1>
-        <div class="tabs">
-            <button class="tab-button active" data-tab="k8-tab">K8 Remote</button>
-            <button class="tab-button" data-tab="chinese-tab">Chinese Remote</button>
-        </div>
-        <div id="k8-tab" class="tab-content active">
-            <div class="grid" id="button-grid-k8">
-                <button class="btn red" data-action="red">Red</button>
-                <button class="btn green" data-action="green">Green</button>
-                <button class="btn blue" data-action="blue">Blue</button>
-                <button class="btn yellow" data-action="yellow">Yellow</button>
-                <button class="btn cyan" data-action="cyan">Cyan</button>
-                <button class="btn magenta" data-action="magenta">Magenta</button>
-                <button class="btn white" data-action="white">White</button>
-                <button class="btn dark" data-action="off">Off</button>
-                <button class="btn gray" data-action="fade">Fade</button>
-                <button class="btn gray" data-action="strobeplus">Strobe+</button>
-                <button class="btn gray" data-action="rgbstrobe">RGB Strobe</button>
-                <button class="btn gray" data-action="rainbow">Rainbow</button>
-                <button class="btn gray" data-action="halfstrobe">Half Strobe</button>
-                <button class="btn gray" data-action="bgstrobe">BG Strobe</button>
-                <button class="btn gray" data-action="grstrobe">GR Strobe</button>
-                <button class="btn gray" data-action="next">Next</button>
-                <button class="btn gray" data-action="demo">Demo</button>
-                <button class="btn gray" data-action="previous">Previous</button>
-            </div>
-        </div>
-        <div id="chinese-tab" class="tab-content">
-            <div class="grid" id="button-grid-chinese">
-                <button class="btn red" data-action="chinese_red">Red</button>
-                <button class="btn green" data-action="chinese_green">Green</button>
-                <button class="btn blue" data-action="chinese_blue">Blue</button>
-                <button class="btn white" data-action="chinese_white">White</button>
-                <button class="btn gray" data-action="chinese_brt_up">BRT Up</button>
-                <button class="btn gray" data-action="chinese_brt_down">BRT Down</button>
-                <button class="btn dark" data-action="chinese_off">OFF</button>
-                <button class="btn gray" data-action="chinese_on">ON</button>
-                <button class="btn gray" data-action="chinese_flash">FLASH</button>
-                <button class="btn gray" data-action="chinese_strobe">STROBE</button>
-                <button class="btn gray" data-action="chinese_fade">FADE</button>
-                <button class="btn gray" data-action="chinese_smooth">SMOOTH</button>
-            </div>
-        </div>
-    </div>
-    <script>
-        // Tab switching
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                button.classList.add('active');
-                document.getElementById(button.dataset.tab).classList.add('active');
-            });
-        });
-
-        // Button click handling for both grids
-        document.getElementById('button-grid-k8').addEventListener('click', handleButtonClick);
-        document.getElementById('button-grid-chinese').addEventListener('click', handleButtonClick);
-
-        function handleButtonClick(event) {
-            if (event.target.tagName === 'BUTTON') {
-                const action = event.target.dataset.action;
-                fetch(`/action?do=${action}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            console.error('Error sending command');
-                        }
-                    })
-                    .catch(error => console.error('Fetch error:', error));
-            }
-        }
-    </script>
-</body>
-</html>
-)rawliteral";
 
 // --- Forward Declarations ---
 void Clear();
@@ -151,43 +54,56 @@ void Halfstrobe(); void BGStrobe(); void GRStrobe(); void Next(); void Demo(); v
 void ChineseRed(); void ChineseGreen(); void ChineseBlue(); void ChineseWhite();
 void ChineseBRTUp(); void ChineseBRTDown(); void ChineseOFF(); void ChineseON();
 void ChineseFLASH(); void ChineseSTROBE(); void ChineseFADE(); void ChineseSMOOTH();
+void extra_red_blue(); void extra_red_green(); void extra_red_white(); void extra_green_blue(); void extra_green_white(); void extra_blue_white();
+void handlePattern();
+String loadIndexHtml();
+void handleStyle();
+void handleScript();
+void handleSetSpeed();
 
 void handleRoot() {
-    server.send(200, "text/html", INDEX_HTML);
+    String htmlContent = loadIndexHtml();
+    server.send(200, "text/html", htmlContent);
 }
 
 void handleAction() {
     String action = server.arg("do");
-    if (action == "red") Red();
-    else if (action == "green") Green();
-    else if (action == "blue") Blue();
-    else if (action == "yellow") Yellow();
-    else if (action == "cyan") Cyan();
-    else if (action == "magenta") Magenta();
-    else if (action == "white") White();
-    else if (action == "off") Off();
-    else if (action == "fade") Fade();
-    else if (action == "strobeplus") Strobeplus();
-    else if (action == "rgbstrobe") RGBStrobe();
-    else if (action == "rainbow") Rainbow();
-    else if (action == "halfstrobe") Halfstrobe();
-    else if (action == "bgstrobe") BGStrobe();
-    else if (action == "grstrobe") GRStrobe();
-    else if (action == "next") Next();
-    else if (action == "demo") Demo();
-    else if (action == "previous") Previous();
-    else if (action == "chinese_red") ChineseRed();
-    else if (action == "chinese_green") ChineseGreen();
-    else if (action == "chinese_blue") ChineseBlue();
-    else if (action == "chinese_white") ChineseWhite();
-    else if (action == "chinese_brt_up") ChineseBRTUp();
-    else if (action == "chinese_brt_down") ChineseBRTDown();
-    else if (action == "chinese_off") ChineseOFF();
-    else if (action == "chinese_on") ChineseON();
-    else if (action == "chinese_flash") ChineseFLASH();
-    else if (action == "chinese_strobe") ChineseSTROBE();
-    else if (action == "chinese_fade") ChineseFADE();
-    else if (action == "chinese_smooth") ChineseSMOOTH();
+    if (action == "red") { currentPattern = 0; patternState = 0; Red(); }
+    else if (action == "green") { currentPattern = 0; patternState = 0; Green(); }
+    else if (action == "blue") { currentPattern = 0; patternState = 0; Blue(); }
+    else if (action == "yellow") { currentPattern = 0; patternState = 0; Yellow(); }
+    else if (action == "cyan") { currentPattern = 0; patternState = 0; Cyan(); }
+    else if (action == "magenta") { currentPattern = 0; patternState = 0; Magenta(); }
+    else if (action == "white") { currentPattern = 0; patternState = 0; White(); }
+    else if (action == "off") { currentPattern = 0; patternState = 0; Off(); }
+    else if (action == "fade") { currentPattern = 0; patternState = 0; Fade(); }
+    else if (action == "strobeplus") { currentPattern = 0; patternState = 0; Strobeplus(); }
+    else if (action == "rgbstrobe") { currentPattern = 0; patternState = 0; RGBStrobe(); }
+    else if (action == "rainbow") { currentPattern = 0; patternState = 0; Rainbow(); }
+    else if (action == "halfstrobe") { currentPattern = 0; patternState = 0; Halfstrobe(); }
+    else if (action == "bgstrobe") { currentPattern = 0; patternState = 0; BGStrobe(); }
+    else if (action == "grstrobe") { currentPattern = 0; patternState = 0; GRStrobe(); }
+    else if (action == "next") { currentPattern = 0; patternState = 0; Next(); }
+    else if (action == "demo") { currentPattern = 0; patternState = 0; Demo(); }
+    else if (action == "previous") { currentPattern = 0; patternState = 0; Previous(); }
+    else if (action == "chinese_red") { currentPattern = 0; patternState = 0; ChineseRed(); }
+    else if (action == "chinese_green") { currentPattern = 0; patternState = 0; ChineseGreen(); }
+    else if (action == "chinese_blue") { currentPattern = 0; patternState = 0; ChineseBlue(); }
+    else if (action == "chinese_white") { currentPattern = 0; patternState = 0; ChineseWhite(); }
+    else if (action == "chinese_brt_up") { currentPattern = 0; patternState = 0; ChineseBRTUp(); }
+    else if (action == "chinese_brt_down") { currentPattern = 0; patternState = 0; ChineseBRTDown(); }
+    else if (action == "chinese_off") { currentPattern = 0; patternState = 0; ChineseOFF(); }
+    else if (action == "chinese_on") { currentPattern = 0; patternState = 0; ChineseON(); }
+    else if (action == "chinese_flash") { currentPattern = 0; patternState = 0; ChineseFLASH(); }
+    else if (action == "chinese_strobe") { currentPattern = 0; patternState = 0; ChineseSTROBE(); }
+    else if (action == "chinese_fade") { currentPattern = 0; patternState = 0; ChineseFADE(); }
+    else if (action == "chinese_smooth") { currentPattern = 0; patternState = 0; ChineseSMOOTH(); }
+    else if (action == "extra_red_blue") extra_red_blue();
+    else if (action == "extra_red_green") extra_red_green();
+    else if (action == "extra_red_white") extra_red_white();
+    else if (action == "extra_green_blue") extra_green_blue();
+    else if (action == "extra_green_white") extra_green_white();
+    else if (action == "extra_blue_white") extra_blue_white();
     else {
         server.send(400, "text/plain", "Invalid action");
         return;
@@ -198,6 +114,58 @@ void handleAction() {
 void handleNotFound() {
     server.sendHeader("Location", "/", true);
     server.send(302, "text/plain", "");
+}
+
+void handleStyle() {
+  if (!LittleFS.begin()) {
+    Serial.println("Failed to mount LittleFS");
+    server.send(500, "text/plain", "Filesystem error");
+    return;
+  }
+
+  File file = LittleFS.open("/style.css", "r");
+  if (!file) {
+    Serial.println("Failed to open style.css");
+    server.send(404, "text/plain", "File not found");
+    return;
+  }
+
+  server.streamFile(file, "text/css");
+  file.close();
+}
+
+void handleScript() {
+  if (!LittleFS.begin()) {
+    Serial.println("Failed to mount LittleFS");
+    server.send(500, "text/plain", "Filesystem error");
+    return;
+  }
+
+  File file = LittleFS.open("/script.js", "r");
+  if (!file) {
+    Serial.println("Failed to open script.js");
+    server.send(404, "text/plain", "File not found");
+    return;
+  }
+
+  server.streamFile(file, "application/javascript");
+  file.close();
+}
+
+void handleSetSpeed() {
+    String speedStr = server.arg("speed");
+    if (speedStr.length() > 0) {
+        unsigned long newDelay = speedStr.toInt();
+        if (newDelay >= 100 && newDelay <= 5000) {
+            color_pair_delay = newDelay;
+            Serial.printf("Speed set to %lums\\n", color_pair_delay);
+            server.send(200, "text/plain", "OK");
+        } else {
+            server.send(400, "text/plain", "Speed must be between 100 and 5000ms");
+        }
+    } else {
+        server.send(400, "text/plain", "Missing speed parameter");
+    }
 }
 
 void setup() {
@@ -227,6 +195,9 @@ void setup() {
     // Setup Web Server
     server.on("/", HTTP_GET, handleRoot);
     server.on("/action", HTTP_GET, handleAction);
+    server.on("/style.css", HTTP_GET, handleStyle);
+    server.on("/script.js", HTTP_GET, handleScript);
+    server.on("/set_speed", HTTP_GET, handleSetSpeed);
     server.onNotFound(handleNotFound);
     server.begin();
 
@@ -238,6 +209,7 @@ unsigned long lastStatusCheck = 0;
 void loop() {
     dnsServer.processNextRequest();
     server.handleClient();
+    handlePattern();
     
     // Print status every 30 seconds
     if (millis() - lastStatusCheck > 30000) {
@@ -250,9 +222,79 @@ void loop() {
     delay(10);
 }
 
+void handlePattern() {
+    if (currentPattern == 0) return;
+
+    unsigned long now = millis();
+    if (now - lastPatternTime >= color_pair_delay) {
+        lastPatternTime = now;
+
+        switch (currentPattern) {
+            case 1: // red_blue
+                if (patternState == 0) {
+                    ChineseRed();
+                    patternState = 1;
+                } else {
+                    ChineseBlue();
+                    patternState = 0;
+                }
+                break;
+            case 2: // red_green
+                if (patternState == 0) {
+                    ChineseRed();
+                    patternState = 1;
+                } else {
+                    ChineseGreen();
+                    patternState = 0;
+                }
+                break;
+            case 3: // red_white
+                if (patternState == 0) {
+                    ChineseRed();
+                    patternState = 1;
+                } else {
+                    ChineseWhite();
+                    patternState = 0;
+                }
+                break;
+            case 4: // green_blue
+                if (patternState == 0) {
+                    ChineseGreen();
+                    patternState = 1;
+                } else {
+                    ChineseBlue();
+                    patternState = 0;
+                }
+                break;
+            case 5: // green_white
+                if (patternState == 0) {
+                    ChineseGreen();
+                    patternState = 1;
+                } else {
+                    ChineseWhite();
+                    patternState = 0;
+                }
+                break;
+            case 6: // blue_white
+                if (patternState == 0) {
+                    ChineseBlue();
+                    patternState = 1;
+                } else {
+                    ChineseWhite();
+                    patternState = 0;
+                }
+                break;
+            default:
+                currentPattern = 0;
+                patternState = 0;
+                break;
+        }
+    }
+}
+
 // --- Color and Command Functions ---
 void Clear() { 
-    Serial.println("Clear called");
+    // Serial.println("Clear called");
     digitalWrite(rPin, LOW);
     digitalWrite(gPin, LOW);
     digitalWrite(bPin, LOW);
@@ -406,4 +448,64 @@ void ChineseFADE() {
 void ChineseSMOOTH() { 
     Serial.println("ChineseSMOOTH called");
     IrSender.sendNECMSB(0x00F7E817, 32, false);
+}
+
+void extra_red_blue() {
+    Serial.println("extra_red_blue called");
+    currentPattern = 1;
+    patternState = 0;
+    lastPatternTime = millis();
+    ChineseRed();
+}
+void extra_red_green() {
+    Serial.println("extra_red_green called");
+    currentPattern = 2;
+    patternState = 0;
+    lastPatternTime = millis();
+    ChineseRed();
+}
+void extra_red_white() {
+    Serial.println("extra_red_white called");
+    currentPattern = 3;
+    patternState = 0;
+    lastPatternTime = millis();
+    ChineseRed();
+}
+void extra_green_blue() {
+    Serial.println("extra_green_blue called");
+    currentPattern = 4;
+    patternState = 0;
+    lastPatternTime = millis();
+    ChineseGreen();
+}
+void extra_green_white() {
+    Serial.println("extra_green_white called");
+    currentPattern = 5;
+    patternState = 0;
+    lastPatternTime = millis();
+    ChineseGreen();
+}
+void extra_blue_white() {
+    Serial.println("extra_blue_white called");
+    currentPattern = 6;
+    patternState = 0;
+    lastPatternTime = millis();
+    ChineseBlue();
+}
+
+String loadIndexHtml() {
+  if (!LittleFS.begin()) {
+    Serial.println("An error occurred while mounting LittleFS");
+    return "Error loading page";
+  }
+
+  File file = LittleFS.open("/index.html", "r");
+  if (!file) {
+    Serial.println("Failed to open index.html");
+    return "Error loading page";
+  }
+
+  String content = file.readString();
+  file.close();
+  return content;
 }
