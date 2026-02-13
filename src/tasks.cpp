@@ -255,17 +255,6 @@ void elegantOTATask(void *parameter) {
     request->redirect("/");  // Windows/Linux captive portal check
   });
 
-  // OTA update endpoint
-  server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request) {
-    // Serve ElegantOTA update page
-    if (otaInProgress) {
-      request->send(200, "text/html", "<h1>OTA Update in Progress</h1><p>Please wait...</p>");
-    } else {
-      // Let ElegantOTA handle this route
-      request->send(200, "text/html", "<h1>OTA Update</h1><p>Go to /update for OTA interface.</p>");
-    }
-  });
-
   // System info endpoint (optional, for debugging)
   server.on("/info", HTTP_GET, [](AsyncWebServerRequest *request) {
     DynamicJsonDocument doc(256);
