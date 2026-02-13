@@ -217,6 +217,15 @@ void onOTAProgress(size_t current, size_t final) {
     Serial.printf("OTA Progress: %u/%u bytes\n", current, final);
   }
 }
+
+void onOTAEnd(bool success) {
+  if (success) {
+    Serial.println("OTA update finished successfully!");
+  } else {
+    Serial.println("OTA update failed!");
+  }
+  otaInProgress = false;
+}
 void elegantOTATask(void *parameter) {
   Serial.println("ElegantOTA task started");
 
