@@ -249,6 +249,10 @@ void elegantOTATask(void *parameter) {
     // Android captive portal check - respond with 204 No Content
     request->send(204);
   });
+  server.on("/gen_204", HTTP_GET, [](AsyncWebServerRequest *request) {
+    // Alternative Android/Chrome captive portal check - respond with 204 No Content
+    request->send(204);
+  });
   server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->redirect("/");  // Apple captive portal check
   });
@@ -257,6 +261,14 @@ void elegantOTATask(void *parameter) {
   });
   server.on("/canonical.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->redirect("/");  // Firefox captive portal check
+  });
+  server.on("/ncsi.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
+    // Chrome/Windows captive portal check - respond with success
+    request->send(200, "text/plain", "success");
+  });
+  server.on("/connecttest.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
+    // Another common Chrome/Windows captive portal endpoint
+    request->send(200, "text/plain", "success");
   });
 
   // System info endpoint (optional, for debugging)
