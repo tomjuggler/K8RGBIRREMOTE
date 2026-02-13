@@ -60,7 +60,7 @@ pio device monitor
 ## Usage
 
 1. Power on the device
-2. Connect to the "K8_RGB_IR_REMOTE" WiFi network from your device
+2. Connect to the "K8_RGB_IR_REMOTE" WiFi network (password: SmartOne) from your device
 3. Open a web browser and navigate to any page (captive portal will redirect to control interface) or directly visit http://192.168.4.1
 4. Use the dual-tab interface:
    - **K8 Remote Tab**: Standard K8 remote commands (colors, effects, demo modes)
@@ -109,7 +109,7 @@ The device outputs status information to the serial port at 115200 baud:
   - If captive portal doesn't redirect, manually visit http://192.168.4.1
   - Some devices may require disabling mobile data for captive portal detection
   - Clear browser cache if interface appears broken
-  - Ensure you're connected to "K8_RGB_IR_REMOTE" WiFi network
+  - Ensure you're connected to "K8_RGB_IR_REMOTE" WiFi network (password: SmartOne)
 
 - **OTA Updates**:
   - Check serial monitor for OTA progress and error messages
