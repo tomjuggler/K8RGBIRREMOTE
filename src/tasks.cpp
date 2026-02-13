@@ -246,13 +246,17 @@ void elegantOTATask(void *parameter) {
 
   // Captive portal redirects for various devices
   server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/");  // Android captive portal check
+    // Android captive portal check - respond with 204 No Content
+    request->send(204);
   });
   server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->redirect("/");  // Apple captive portal check
   });
   server.on("/connectivity-check.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->redirect("/");  // Windows/Linux captive portal check
+  });
+  server.on("/canonical.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/");  // Firefox captive portal check
   });
 
   // System info endpoint (optional, for debugging)
